@@ -18,19 +18,19 @@ func main() {
 
 	scoreSheet := map[byte]map[byte]int{
 		'A': {
-			'X': scoreForTie + shapeRock,      // elf: rock, me: rock
-			'Y': scoreForWin + shapePaper,     // elf: rock, me: paper
-			'Z': scoreForLoss + shapeScissors, // elf: rock, me: scissors
+			'X': scoreForLoss + shapeScissors, // elf: rock, me: loss
+			'Y': scoreForTie + shapeRock,      // elf: rock, me: tie
+			'Z': scoreForWin + shapePaper,     // elf: rock, me: win
 		},
 		'B': {
-			'X': scoreForLoss + shapeRock,    // elf: paper, me: rock
-			'Y': scoreForTie + shapePaper,    // elf: paper, me: paper
-			'Z': scoreForWin + shapeScissors, // elf: paper, me: scissors
+			'X': scoreForLoss + shapeRock,    // elf: paper, me: loss
+			'Y': scoreForTie + shapePaper,    // elf: paper, me: tie
+			'Z': scoreForWin + shapeScissors, // elf: paper, me: win
 		},
 		'C': {
-			'X': scoreForWin + shapeRock,     // elf: scissors, me: rock
-			'Y': scoreForLoss + shapePaper,   // elf: scissors, me: paper
-			'Z': scoreForTie + shapeScissors, // elf: scissors, me: scissors
+			'X': scoreForLoss + shapePaper,   // elf: scissors, me: loss
+			'Y': scoreForTie + shapeScissors, // elf: scissors, me: tie
+			'Z': scoreForWin + shapeRock,     // elf: scissors, me: win
 		},
 	}
 
