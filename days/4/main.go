@@ -44,7 +44,7 @@ func main() {
 				continue
 			}
 
-			segmentsAreTheSame := aFullyContainsB(thisLineSegment, previousSegment)
+			segmentsAreTheSame := aAndBOverlap(thisLineSegment, previousSegment)
 
 			if segmentsAreTheSame {
 				fmt.Println("thisLineSegment")
@@ -92,33 +92,15 @@ func getSections(rangeString string) []int {
 	return sections
 }
 
-func aFullyContainsB(a, b []int) bool {
-	// this will check if a fully contains b
+func aAndBOverlap(a, b []int) bool {
 
-	if a[0] <= b[0] && a[len(a)-1] >= b[len(b)-1] {
-		return true
-	}
-
-	if a[0] >= b[0] && a[len(a)-1] <= b[len(b)-1] {
-		return true
-	}
-
-	return false
-}
-
-func slicesAreEqual(a, b []int) bool {
-	// this will check if two slices are equal
-
-	if len(a) != len(b) {
-		return false
-	}
-
-	for i, v := range a {
-		if v != b[i] {
-			// fmt.Println("not equal")
-			return false
+	for i := 0; i < len(a); i++ {
+		for j := 0; j < len(b); j++ {
+			if a[i] == b[j] {
+				return true
+			}
 		}
 	}
 
-	return true
+	return false
 }
