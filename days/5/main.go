@@ -76,47 +76,77 @@ func main() {
 
 func arrangeStacks(stacks []string) []string {
 
-	spacerModifier := 0.25
+	// spacerModifier := 0.25
 
-	arrangedStacks := make([][]string, len(stacks))
+	arrangedStacks := make([][]string, (len(stacks[0])/4)+1)
 
-	for i, stack := range stacks {
+	for _, stack := range stacks {
 
 		// var thisStack []string
 
-		thisStack := make([]string, (int(float64(len(stack))+spacerModifier) / 4))
+		// thisStack := make([]string, (int(float64(len(stack))+spacerModifier) / 4))
 
-		fmt.Println("stack", thisStack)
-		fmt.Println("thisStack len", len(thisStack))
+		// fmt.Println("stack", thisStack)
+		// fmt.Println("thisStack len", len(thisStack))
 
 		// for every n + 1 % 4, it's a stack.
 
-		for j, _ := range stack {
+		stackWithChar := stack + " "
+
+		for j, _ := range stackWithChar {
 			// if i is a multiple of 3, minus 1 for each stack we've already had, it's a stack
-			if (j+1)%4 == 0 {
+
+			// refIndex := j
+
+			// if j == len(stack)-1 {
+			// 	refIndex = j + 1
+			// }
+
+			fmt.Println("---")
+			fmt.Print("----", stackWithChar, "----")
+			fmt.Println("---")
+
+			if (j+1)%4 == 0 { // || j == len(stack)-1
 				// arrangedStacks[i] = stack[1:len(stack)-1]
 				// thisStack = thisStack + string(char)
 				// thisStack = append(thisStack, string(char-1))
 
 				// arrangedStacks[(j+1)/4] = strings.Join(thisStack, "")
 
-				previousChar := stack[j-2 : j-1]
+				// previousChar := stack[refIndex-2 : refIndex-1]
+
+				// if j == 1 {
+				// 	continue
+				// }
+
+				previousChar := string(stackWithChar[j-2])
 
 				fmt.Println("char", previousChar)
-				thisStack[((j+1)/4)-1] = previousChar
+				fmt.Println("j", j)
+				fmt.Println("len(stackWithChar)", len(stackWithChar))
+				// arrangedStacks[i][((j+1)/4)-1] = previousChar
+
+				insertIndex := ((j + 1) / 4) - 1
+
+				arrangedStacks[insertIndex] = append(arrangedStacks[insertIndex], previousChar)
+
+				fmt.Println("arrangedStacks", arrangedStacks)
 
 			}
 
 			// previousChar = string(char)
+			fmt.Println("------------------")
 
 		}
 
-		fmt.Println("char", string(stack[len(stack)-2]))
+		fmt.Println("char", string(stackWithChar[len(stackWithChar)-2]))
 
-		thisStack[len(arrangedStacks)-1] = string(stack[len(stack)-2])
+		// arrangedStacks[i][len(arrangedStacks)-1] = string(stack[len(stack)-2])
+
+		// arrangedStacks[len(arrangedStacks)-1] = append(arrangedStacks[len(arrangedStacks)-1], string(stack[len(stack)-2]))
 
 		// arrangedStacks = append(arrangedStacks, thisStack)
-		arrangedStacks[i] = thisStack
+		// arrangedStacks[i] = thisStack
 
 	}
 
