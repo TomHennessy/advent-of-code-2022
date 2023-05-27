@@ -28,26 +28,11 @@ func main() {
 
 		thisLine := scanner.Text()
 
-		firstHalfItems := strings.Split(thisLine[:len(thisLine)/2], "")
-		secondHalf := strings.Split(thisLine[len(thisLine)/2:], "")
+		itemLists := [][]string{strings.Split(thisLine[:len(thisLine)/2], ""), strings.Split(thisLine[len(thisLine)/2:], "")}
 
-		intersections := intersect.SimpleGeneric(firstHalfItems, secondHalf)
+		sharedItem := getShared(itemLists) //intersections[0]
 
-		sharedItem := intersections[0]
-
-		priority := sharedItem[0]
-
-		if priority >= 91 {
-
-			priority = priority - 96
-
-		} else {
-
-			priority = priority - 38
-
-		}
-
-		totalPriority += int(priority)
+		totalPriority += getPriority(sharedItem[0])
 
 	}
 
@@ -60,16 +45,34 @@ func main() {
 
 }
 
-// func itemPriority(item string) int {
+func getShared(arr [][]string) string {
+	// arr is an array of strings.
 
-// 	var priority rune
+	intersections := arr[0] // initialize with first line
 
-// 	priority = rune(item[0])
-// 	if priority >= 91 {
-// 		priority = priority - 96
-// 	} else {
-// 		priority = priority - 38
-// 	}
+	for i := 1; i < len(arr); i++ {
 
-// 	return int(priority)
-// }
+		intersections = intersect.SimpleGeneric(intersections, arr[i])
+
+	}
+
+	return intersections[0]
+
+}
+
+func getPriority(char byte) int {
+
+	if char >= 91 {
+
+		return int(char - 96)
+
+	} else {
+
+		return int(char - 38)
+
+	}
+
+}
+
+// every 3 lines is a new group
+// the only value shared between all 3 lines is the badge number
