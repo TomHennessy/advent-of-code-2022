@@ -24,15 +24,23 @@ func main() {
 
 	var totalPriority int
 
+	var itemLists [][]string
+
 	for scanner.Scan() {
 
 		thisLine := scanner.Text()
 
-		itemLists := [][]string{strings.Split(thisLine[:len(thisLine)/2], ""), strings.Split(thisLine[len(thisLine)/2:], "")}
+		itemLists = append(itemLists, strings.Split(thisLine, ""))
 
-		sharedItem := getShared(itemLists) //intersections[0]
+		if len(itemLists) == 3 {
 
-		totalPriority += getPriority(sharedItem[0])
+			sharedItem := getShared(itemLists) //intersections[0]
+
+			totalPriority += getPriority(sharedItem[0])
+
+			itemLists = [][]string{}
+
+		}
 
 	}
 
