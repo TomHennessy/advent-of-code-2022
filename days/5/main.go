@@ -50,8 +50,6 @@ func main() {
 
 			processedStacks = arrangedStacks
 
-			printStacks("arrangedStacks", arrangedStacks)
-
 			continue
 		}
 
@@ -67,17 +65,7 @@ func main() {
 
 		processedStacks = performOperation(thisLine, processedStacks)
 
-		// -----------------
-
-		// then perform the operations on the stacks
-
 	}
-
-	// fmt.Println(startingStacks)
-
-	// fmt.Println("startingStacks", startingStacks)
-
-	printStacks("processedStacks", processedStacks)
 
 	fmt.Println("answer::")
 	fmt.Println("------------------")
@@ -85,26 +73,6 @@ func main() {
 	for _, stack := range processedStacks {
 		fmt.Print(stack[0])
 	}
-
-	// fmt.Println("------------------")
-
-	// fmt.Println("arrangedStacks")
-	// fmt.Println("------------------")
-
-	// for _, stack := range arrangedStacks {
-	// 	fmt.Println(stack)
-	// }
-
-	// fmt.Println("------------------")
-
-	// fmt.Println("startingStacks")
-	// fmt.Println("------------------")
-
-	// for _, stack := range startingStacks {
-	// 	fmt.Println(stack)
-	// }
-
-	// fmt.Println("------------------")
 
 }
 
@@ -147,7 +115,7 @@ func performOperation(operation string, stacks [][]string) [][]string {
 
 	// first, determine which stack to take from and which to put on
 
-	// move 3 from 9 to 7
+	// example: move 3 from 9 to 7
 
 	splitOperation := strings.Split(operation, " ")
 
@@ -157,39 +125,28 @@ func performOperation(operation string, stacks [][]string) [][]string {
 
 	operationTo, _ := strconv.Atoi(splitOperation[5])
 
-	fmt.Println("------------------")
-
-	// fmt.Println("stacks", stacks)
-
-	fmt.Println("operationNumber", operationNumber)
-
-	fmt.Println("operationFrom", operationFrom)
-
-	fmt.Println("operationTo", operationTo)
-
-	fmt.Println("------------------")
-
 	// then, perform the operation
 
-	itemsMoved := 0
+	itemsToMove := make([]string, 0)
 
-	// remove the items from the from stack and load them into the itemsToMove array
-	// for i, item := range stacks[operationFrom-1] {
+	// remove the items from the from stack and add them to the to stack
 	for i := 0; i < len(stacks[operationFrom-1]); i++ {
 
 		item := stacks[operationFrom-1][i]
 
-		itemsMoved++
+		itemsToMove = append(itemsToMove, item)
 
-		// add the item to the to stack
-		stacks[operationTo-1] = prependStr(stacks[operationTo-1], item)
+		if len(itemsToMove) == operationNumber {
 
-		// remove the item from the stack
-		stacks[operationFrom-1] = append(stacks[operationFrom-1][:i], stacks[operationFrom-1][i+1:]...)
+			for j := operationNumber - 1; j >= 0; j-- {
 
-		i--
+				// add the item to the to stack
+				stacks[operationTo-1] = prependStr(stacks[operationTo-1], itemsToMove[j])
 
-		if itemsMoved == operationNumber {
+				// remove the item from the stack
+				stacks[operationFrom-1] = append(stacks[operationFrom-1][:j], stacks[operationFrom-1][j+1:]...)
+
+			}
 
 			break
 
@@ -197,13 +154,8 @@ func performOperation(operation string, stacks [][]string) [][]string {
 
 	}
 
-	fmt.Println("------------------")
-
-	fmt.Println("stacks", stacks)
-
-	// os.Exit(1)
-
 	return stacks
+
 }
 
 func prependStr(x []string, y string) []string {
@@ -211,18 +163,4 @@ func prependStr(x []string, y string) []string {
 	copy(x[1:], x)
 	x[0] = y
 	return x
-}
-
-func printStacks(label string, stacks [][]string) {
-
-	fmt.Println("------------------")
-
-	fmt.Println(label)
-
-	for _, stack := range stacks {
-
-		fmt.Println(stack)
-
-	}
-
 }
