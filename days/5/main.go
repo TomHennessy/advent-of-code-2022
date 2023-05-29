@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
+	"strings"
 )
 
 func main() {
@@ -20,6 +22,8 @@ func main() {
 	scanner := bufio.NewScanner(file)
 
 	var startingStacks []string
+	var arrangedStacks [][]string
+	var processedStacks [][]string
 	isStartingStacks := true
 
 	for scanner.Scan() {
@@ -42,7 +46,11 @@ func main() {
 			startingStacks = startingStacks[:len(startingStacks)-1]
 
 			// then format the stacks into appropriate data structures
-			startingStacks = arrangeStacks(startingStacks)
+			arrangedStacks = arrangeStacks(startingStacks)
+
+			processedStacks = arrangedStacks
+
+			printStacks("arrangedStacks", arrangedStacks)
 
 			continue
 		}
@@ -51,7 +59,13 @@ func main() {
 
 			startingStacks = append(startingStacks, thisLine)
 
+			continue
+
 		}
+
+		// from here, we're dealing with the operations
+
+		processedStacks = performOperation(thisLine, processedStacks)
 
 		// -----------------
 
@@ -63,101 +77,152 @@ func main() {
 
 	// fmt.Println("startingStacks", startingStacks)
 
-	fmt.Println("startingStacks")
+	printStacks("processedStacks", processedStacks)
+
+	fmt.Println("answer::")
 	fmt.Println("------------------")
 
-	for _, stack := range startingStacks {
-		fmt.Println(stack)
+	for _, stack := range processedStacks {
+		fmt.Print(stack[0])
 	}
 
-	fmt.Println("------------------")
+	// fmt.Println("------------------")
+
+	// fmt.Println("arrangedStacks")
+	// fmt.Println("------------------")
+
+	// for _, stack := range arrangedStacks {
+	// 	fmt.Println(stack)
+	// }
+
+	// fmt.Println("------------------")
+
+	// fmt.Println("startingStacks")
+	// fmt.Println("------------------")
+
+	// for _, stack := range startingStacks {
+	// 	fmt.Println(stack)
+	// }
+
+	// fmt.Println("------------------")
 
 }
 
-func arrangeStacks(stacks []string) []string {
+func arrangeStacks(stacks []string) [][]string {
 
-	// spacerModifier := 0.25
-
+	// the length of each stack is 4 (including a space at the end of each)
 	arrangedStacks := make([][]string, (len(stacks[0])/4)+1)
 
 	for _, stack := range stacks {
 
-		// var thisStack []string
-
-		// thisStack := make([]string, (int(float64(len(stack))+spacerModifier) / 4))
-
-		// fmt.Println("stack", thisStack)
-		// fmt.Println("thisStack len", len(thisStack))
-
-		// for every n + 1 % 4, it's a stack.
-
+		// add the space so they're all uniform length and layout
 		stackWithChar := stack + " "
 
-		for j, _ := range stackWithChar {
-			// if i is a multiple of 3, minus 1 for each stack we've already had, it's a stack
+		for j := range stackWithChar {
 
-			// refIndex := j
-
-			// if j == len(stack)-1 {
-			// 	refIndex = j + 1
-			// }
-
-			fmt.Println("---")
-			fmt.Print("----", stackWithChar, "----")
-			fmt.Println("---")
-
-			if (j+1)%4 == 0 { // || j == len(stack)-1
-				// arrangedStacks[i] = stack[1:len(stack)-1]
-				// thisStack = thisStack + string(char)
-				// thisStack = append(thisStack, string(char-1))
-
-				// arrangedStacks[(j+1)/4] = strings.Join(thisStack, "")
-
-				// previousChar := stack[refIndex-2 : refIndex-1]
-
-				// if j == 1 {
-				// 	continue
-				// }
+			if (j+1)%4 == 0 {
 
 				previousChar := string(stackWithChar[j-2])
 
-				fmt.Println("char", previousChar)
-				fmt.Println("j", j)
-				fmt.Println("len(stackWithChar)", len(stackWithChar))
-				// arrangedStacks[i][((j+1)/4)-1] = previousChar
+				if previousChar == " " {
+
+					continue
+
+				}
 
 				insertIndex := ((j + 1) / 4) - 1
 
 				arrangedStacks[insertIndex] = append(arrangedStacks[insertIndex], previousChar)
 
-				fmt.Println("arrangedStacks", arrangedStacks)
-
 			}
-
-			// previousChar = string(char)
-			fmt.Println("------------------")
 
 		}
 
-		fmt.Println("char", string(stackWithChar[len(stackWithChar)-2]))
+	}
 
-		// arrangedStacks[i][len(arrangedStacks)-1] = string(stack[len(stack)-2])
+	return arrangedStacks
+}
 
-		// arrangedStacks[len(arrangedStacks)-1] = append(arrangedStacks[len(arrangedStacks)-1], string(stack[len(stack)-2]))
+func performOperation(operation string, stacks [][]string) [][]string {
 
-		// arrangedStacks = append(arrangedStacks, thisStack)
-		// arrangedStacks[i] = thisStack
+	// first, determine which stack to take from and which to put on
+
+	// move 3 from 9 to 7
+
+	splitOperation := strings.Split(operation, " ")
+
+	operationNumber, _ := strconv.Atoi(splitOperation[1])
+
+	operationFrom, _ := strconv.Atoi(splitOperation[3])
+
+	operationTo, _ := strconv.Atoi(splitOperation[5])
+
+	fmt.Println("------------------")
+
+	// fmt.Println("stacks", stacks)
+
+	fmt.Println("operationNumber", operationNumber)
+
+	fmt.Println("operationFrom", operationFrom)
+
+	fmt.Println("operationTo", operationTo)
+
+	fmt.Println("------------------")
+
+	// then, perform the operation
+
+	itemsMoved := 0
+
+	// remove the items from the from stack and load them into the itemsToMove array
+	// for i, item := range stacks[operationFrom-1] {
+	for i := 0; i < len(stacks[operationFrom-1]); i++ {
+
+		item := stacks[operationFrom-1][i]
+
+		itemsMoved++
+
+		// add the item to the to stack
+		stacks[operationTo-1] = prependStr(stacks[operationTo-1], item)
+
+		// remove the item from the stack
+		stacks[operationFrom-1] = append(stacks[operationFrom-1][:i], stacks[operationFrom-1][i+1:]...)
+
+		i--
+
+		if itemsMoved == operationNumber {
+
+			break
+
+		}
 
 	}
 
-	fmt.Println("arrangedStacks")
 	fmt.Println("------------------")
 
-	for _, stack := range arrangedStacks {
-		fmt.Println(stack)
-	}
+	fmt.Println("stacks", stacks)
 
-	fmt.Println("------------------")
+	// os.Exit(1)
 
 	return stacks
+}
+
+func prependStr(x []string, y string) []string {
+	x = append(x, "")
+	copy(x[1:], x)
+	x[0] = y
+	return x
+}
+
+func printStacks(label string, stacks [][]string) {
+
+	fmt.Println("------------------")
+
+	fmt.Println(label)
+
+	for _, stack := range stacks {
+
+		fmt.Println(stack)
+
+	}
+
 }
