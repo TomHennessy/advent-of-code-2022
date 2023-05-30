@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -59,25 +60,41 @@ func main() {
 	for directory := range directories {
 
 		directorySizes[directory] = getFileSize(directories, directory)
-		// fmt.Println("directorySizes[directory] =", directorySizes[directory])
+		// fmt.Println("directorySizes", directory, directorySizes[directory])
 
 	}
 
-	// fmt.Println("directorySizes =", directorySizes)
+	type kv struct {
+		Key   string
+		Value int
+	}
 
-	sumOfGreater100000 := 0
+	var ss []kv
+	for k, v := range directorySizes {
+		ss = append(ss, kv{k, v})
+	}
 
-	for _, size := range directorySizes {
-		// println(directory, size)
-		if size <= 100000 {
-			sumOfGreater100000 += size
+	sort.Slice(ss, func(i, j int) bool {
+		return ss[i].Value < ss[j].Value
+	})
+
+	// previousKey := ""
+	for _, kv := range ss {
+		fmt.Printf("%s, %d\n", kv.Key, kv.Value)
+		fmt.Println("not this--")
+		if directorySizes["/"]-kv.Value <= 40000000 {
+			fmt.Printf("%s, %d\n", kv.Key, kv.Value)
+			fmt.Println("--")
+			break
 		}
 
-		// fmt.Println("dir", dir, "size", size)
-
+		// previousKey = kv.Key
 	}
 
-	fmt.Println(sumOfGreater100000)
+	// fmt.Println("previousKey =", previousKey)
+	// fmt.Println("directorySizes[previousKey] =", directorySizes[previousKey])
+	// fmt.Println(directorySizes)
+	fmt.Println("Current used space:", directorySizes["/"])
 
 }
 
@@ -131,9 +148,9 @@ func createDirectoryMap() map[string]map[string]int {
 
 				if thisLine[5:] == ".." {
 
-					fmt.Println("-----------------------")
-					fmt.Println("-----------------------")
-					fmt.Println("currentIndexPointer =", currentIndexPointer)
+					// fmt.Println("-----------------------")
+					// fmt.Println("-----------------------")
+					// fmt.Println("currentIndexPointer =", currentIndexPointer)
 
 					// currentIndexPointer = currentIndexPointer[:strings.LastIndex(currentIndexPointer, "/")] + "/"
 
@@ -141,10 +158,10 @@ func createDirectoryMap() map[string]map[string]int {
 
 					currentIndexPointer = strings.Join(currentIndexPointerSplit[:len(currentIndexPointerSplit)-2], "/") + "/"
 
-					fmt.Println("currentIndexPointerNew =", currentIndexPointer)
+					// fmt.Println("currentIndexPointerNew =", currentIndexPointer)
 
-					fmt.Println("-----------------------")
-					fmt.Println("-----------------------")
+					// fmt.Println("-----------------------")
+					// fmt.Println("-----------------------")
 					continue
 				}
 
@@ -203,7 +220,7 @@ func createDirectoryMap() map[string]map[string]int {
 
 				}
 
-				fmt.Println("currentIndexPointer lalala::", currentIndexPointer)
+				// fmt.Println("currentIndexPointer lalala::", currentIndexPointer)
 
 				if len(directories[currentIndexPointer]) == 0 {
 
