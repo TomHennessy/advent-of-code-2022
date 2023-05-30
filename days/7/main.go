@@ -222,7 +222,7 @@ func createDirectoryMap() map[string]map[string]int {
 
 		if thisLine[0:3] == "dir" {
 
-			directories[currentIndexPointer][thisLine[4:]] = 0
+			directories[currentIndexPointer][currentIndexPointer+thisLine[4:]+"/"] = 0
 
 			continue
 
