@@ -19,49 +19,40 @@ func main() {
 
 	defer file.Close()
 
-	// fmt.Printf("%d bytes @ %d: %s\n", n2, o2, string(bytesToRead))
+	startOfPacket := getFirstNonRepeating(file, 0, 4)
 
-	getStartOfPacket(file)
+	startOfMessage := getFirstNonRepeating(file, startOfPacket, 14)
 
-	// fmt.Println("o2 = ", o2)
+	fmt.Println("startOfMessage =", startOfMessage)
 
 }
 
-func getStartOfPacket(file *os.File) string {
+func getFirstNonRepeating(file *os.File, start int64, length int64) int64 {
 
 	fileStats, err := file.Stat()
 
 	check(err)
 
-	for i := int64(0); i < int64(fileStats.Size()); i++ {
+	for i := start; i < int64(fileStats.Size()); i++ {
 
-		// move along the file 6 bytes
-		o2, err := file.Seek(i, 0)
-
-		check(err)
-
-		// read 2 bytes from the current position
-		bytesToRead := make([]byte, 4)
-
-		n2, err := file.Read(bytesToRead)
+		file.Seek(i, 0)
 
 		check(err)
 
-		// return string(bytesToRead)
+		bytesToRead := make([]byte, length)
 
-		// charList := strings.Split(string(bytesToRead), "")
+		file.Read(bytesToRead)
+
+		check(err)
 
 		if unique(string(bytesToRead)) {
-			fmt.Printf("%d bytes @ %d: %s\n", n2, o2, string(bytesToRead))
-			fmt.Println("Characters processed: ", i+4)
-			return string(bytesToRead)
+			return i + length
 		}
 
 	}
 
-	return ""
+	return -1 // not found, allows for error checking
 
-	// return o2
 }
 
 func unique(arr string) bool {
