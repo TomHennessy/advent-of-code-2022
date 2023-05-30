@@ -22,12 +22,14 @@ func main() {
 
 	// fmt.Println("directories =", directories)
 
-	for dir, size := range directories {
-		// println(directory, size)
+	// for dir, size := range directories {
+	// 	// println(directory, size)
 
-		fmt.Println("dir", dir, "size", size)
+	// 	fmt.Println("dir", dir)
+	// 	fmt.Println("size", size)
+	// 	fmt.Println("----------------------")
 
-	}
+	// }
 
 	// b, err := json.Marshal(directories)
 
@@ -110,10 +112,12 @@ func createDirectoryMap() map[string]map[string]int {
 
 	directories := make(map[string]map[string]int)
 
-	var currentIndex string
-	currentIndexHash := 0
+	currentIndex := ""
+	// currentIndexHash := 0
 
-	var dirNameMap = make(map[string]string)
+	currentIndexPointer := ""
+
+	// var dirNameMap = make(map[string]string)
 
 	for scanner.Scan() {
 
@@ -126,56 +130,86 @@ func createDirectoryMap() map[string]map[string]int {
 			if thisLine[2:4] == "cd" {
 
 				if thisLine[5:] == ".." {
+
+					fmt.Println("-----------------------")
+					fmt.Println("-----------------------")
+					fmt.Println("currentIndexPointer =", currentIndexPointer)
+
+					// currentIndexPointer = currentIndexPointer[:strings.LastIndex(currentIndexPointer, "/")] + "/"
+
+					currentIndexPointerSplit := strings.Split(currentIndexPointer, "/")
+
+					currentIndexPointer = strings.Join(currentIndexPointerSplit[:len(currentIndexPointerSplit)-2], "/") + "/"
+
+					fmt.Println("currentIndexPointerNew =", currentIndexPointer)
+
+					fmt.Println("-----------------------")
+					fmt.Println("-----------------------")
 					continue
 				}
 
-				fmt.Println("--------------")
-				fmt.Println("--------------")
-				fmt.Println("--------------")
-				fmt.Println("--------------")
-				fmt.Println("--------------")
-				fmt.Println("directories[thisLine[5:]] == nil", directories[thisLine[5:]])
+				if thisLine[5:] != "/" {
 
-				if len(directories[thisLine[5:]]) != 0 {
+					// fmt.Println("--------------")
+					// fmt.Println("--------------")
+					// fmt.Println("--------------")
+					// fmt.Println("--------------")
+					// fmt.Println("--------------")
+					// fmt.Println("directories[thisLine[5:]] == nil", directories[thisLine[5:]])
+
+					// if len(directories[thisLine[5:]]) != 0 {
 
 					currentIndex = thisLine[5:]
 
+					// } else {
+
+					// 	// currentIndex = currentIndexHash + "/" + thisLine[5:]
+
+					// 	// current index should have a prefix of the currentIndexHash
+
+					// 	currentIndex = strconv.Itoa(currentIndexHash) + "_" + thisLine[5:]
+
+					// 	dirNameMap[thisLine[5:]] = ""
+					// 	dirNameMap[thisLine[5:]] = currentIndex
+
+					// 	currentIndexHash++
+
+					// 	fmt.Println("--------------")
+					// 	fmt.Println("--------------")
+					// 	fmt.Println("--------------")
+					// 	fmt.Println("--------------")
+					// 	fmt.Println("--------------")
+					// 	fmt.Println("currentIndex =", currentIndex)
+
+					// }
+
+					currentIndexPointer += currentIndex + "/"
+
+					// if currentIndex == "gftgshl" {
+
+					// 	fmt.Println("-----------")
+					// 	fmt.Println("-----------")
+					// 	fmt.Println("-----------")
+					// 	fmt.Println("-----------")
+					// 	fmt.Println("currentIndex =", currentIndex)
+					// 	fmt.Println("directories =", directories)
+
+					// 	// os.Exit(1)
+
+					// }
 				} else {
 
-					// currentIndex = currentIndexHash + "/" + thisLine[5:]
-
-					// current index should have a prefix of the currentIndexHash
-
-					currentIndex = strconv.Itoa(currentIndexHash) + "_" + thisLine[5:]
-
-					dirNameMap[thisLine[5:]] = ""
-					dirNameMap[thisLine[5:]] = currentIndex
-
-					currentIndexHash++
-
-					fmt.Println("--------------")
-					fmt.Println("--------------")
-					fmt.Println("--------------")
-					fmt.Println("--------------")
-					fmt.Println("--------------")
-					fmt.Println("currentIndex =", currentIndex)
+					currentIndexPointer = "/"
 
 				}
 
-				// if currentIndex == "gftgshl" {
+				fmt.Println("currentIndexPointer lalala::", currentIndexPointer)
 
-				// 	fmt.Println("-----------")
-				// 	fmt.Println("-----------")
-				// 	fmt.Println("-----------")
-				// 	fmt.Println("-----------")
-				// 	fmt.Println("currentIndex =", currentIndex)
-				// 	fmt.Println("directories =", directories)
+				if len(directories[currentIndexPointer]) == 0 {
 
-				// 	// os.Exit(1)
+					directories[currentIndexPointer] = make(map[string]int)
 
-				// }
-
-				directories[currentIndex] = make(map[string]int)
+				}
 
 			}
 			// else if thisLine[2:4] == "ls" {
@@ -188,7 +222,7 @@ func createDirectoryMap() map[string]map[string]int {
 
 		if thisLine[0:3] == "dir" {
 
-			directories[currentIndex][dirNameMap[thisLine[4:]]] = 0
+			directories[currentIndexPointer][thisLine[4:]] = 0
 
 			continue
 
@@ -202,7 +236,7 @@ func createDirectoryMap() map[string]map[string]int {
 
 		check(err)
 
-		directories[currentIndex][fileName] = fileSize
+		directories[currentIndexPointer][fileName] = fileSize
 
 		// if currentIndex == "ddgtnw" {
 
