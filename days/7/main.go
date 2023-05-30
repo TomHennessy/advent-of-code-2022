@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"fmt"
 	"os"
 	"strconv"
 	"strings"
@@ -17,6 +18,85 @@ func main() {
 
 	directories := createDirectoryMap()
 
+	// directories := make(map[string]map[string]int)
+
+	// fmt.Println("directories =", directories)
+
+	for dir, size := range directories {
+		// println(directory, size)
+
+		fmt.Println("dir", dir, "size", size)
+
+	}
+
+	// b, err := json.Marshal(directories)
+
+	// check(err)
+
+	// fmt.Println("-----------")
+	// fmt.Println("-----------")
+	// fmt.Println("-----------")
+	// fmt.Println(string(b))
+
+	// os.Exit(0)
+
+	// directories = [map[a: e:0 f:29116 g:2557 h.lst:62596]]
+	// directories["a"] = make(map[string]int)
+	// directories["a"]["e"] = 0
+	// directories["a"]["f"] = 29116
+	// directories["a"]["g"] = 2557
+	// directories["a"]["h.lst"] = 62596
+
+	// directories["e"] = make(map[string]int)
+	// directories["e"]["i"] = 584
+
+	// fmt.Println("directories =", directories)
+
+	directorySizes := make(map[string]int)
+
+	for directory := range directories {
+
+		directorySizes[directory] = getFileSize(directories, directory)
+		// fmt.Println("directorySizes[directory] =", directorySizes[directory])
+
+	}
+
+	// fmt.Println("directorySizes =", directorySizes)
+
+	sumOfGreater100000 := 0
+
+	for _, size := range directorySizes {
+		// println(directory, size)
+		if size <= 100000 {
+			sumOfGreater100000 += size
+		}
+
+		// fmt.Println("dir", dir, "size", size)
+
+	}
+
+	fmt.Println(sumOfGreater100000)
+
+}
+
+func getFileSize(directories map[string]map[string]int, directory string) int {
+
+	var totalSize int
+
+	for fileName, fileSize := range directories[directory] {
+
+		if fileSize == 0 {
+			totalSize += getFileSize(directories, fileName)
+		} else {
+			totalSize += fileSize
+		}
+
+	}
+
+	// fmt.Println("totalSize =", totalSize)
+
+	return totalSize
+
 }
 
 func createDirectoryMap() map[string]map[string]int {
@@ -31,6 +111,9 @@ func createDirectoryMap() map[string]map[string]int {
 	directories := make(map[string]map[string]int)
 
 	var currentIndex string
+	currentIndexHash := 0
+
+	var dirNameMap = make(map[string]string)
 
 	for scanner.Scan() {
 
@@ -41,17 +124,63 @@ func createDirectoryMap() map[string]map[string]int {
 		if thisLine[:1] == "$" {
 
 			if thisLine[2:4] == "cd" {
-				currentIndex = thisLine[5:]
 
-				if currentIndex == ".." {
+				if thisLine[5:] == ".." {
 					continue
 				}
 
+				fmt.Println("--------------")
+				fmt.Println("--------------")
+				fmt.Println("--------------")
+				fmt.Println("--------------")
+				fmt.Println("--------------")
+				fmt.Println("directories[thisLine[5:]] == nil", directories[thisLine[5:]])
+
+				if len(directories[thisLine[5:]]) != 0 {
+
+					currentIndex = thisLine[5:]
+
+				} else {
+
+					// currentIndex = currentIndexHash + "/" + thisLine[5:]
+
+					// current index should have a prefix of the currentIndexHash
+
+					currentIndex = strconv.Itoa(currentIndexHash) + "_" + thisLine[5:]
+
+					dirNameMap[thisLine[5:]] = ""
+					dirNameMap[thisLine[5:]] = currentIndex
+
+					currentIndexHash++
+
+					fmt.Println("--------------")
+					fmt.Println("--------------")
+					fmt.Println("--------------")
+					fmt.Println("--------------")
+					fmt.Println("--------------")
+					fmt.Println("currentIndex =", currentIndex)
+
+				}
+
+				// if currentIndex == "gftgshl" {
+
+				// 	fmt.Println("-----------")
+				// 	fmt.Println("-----------")
+				// 	fmt.Println("-----------")
+				// 	fmt.Println("-----------")
+				// 	fmt.Println("currentIndex =", currentIndex)
+				// 	fmt.Println("directories =", directories)
+
+				// 	// os.Exit(1)
+
+				// }
+
 				directories[currentIndex] = make(map[string]int)
 
-			} else if thisLine[2:4] == "ls" {
-				continue
 			}
+			// else if thisLine[2:4] == "ls" {
+			// 	continue
+			// }
 
 			continue
 
@@ -59,7 +188,7 @@ func createDirectoryMap() map[string]map[string]int {
 
 		if thisLine[0:3] == "dir" {
 
-			directories[currentIndex][thisLine[4:]] = 0
+			directories[currentIndex][dirNameMap[thisLine[4:]]] = 0
 
 			continue
 
@@ -75,6 +204,20 @@ func createDirectoryMap() map[string]map[string]int {
 
 		directories[currentIndex][fileName] = fileSize
 
+		// if currentIndex == "ddgtnw" {
+
+		// 	fmt.Println("-----------")
+
+		// 	fmt.Println("currentIndex =", currentIndex)
+		// 	fmt.Println("fileName =", fileName)
+		// 	fmt.Println("fileSize =", fileSize)
+		// 	fmt.Println("directories =", directories)
+
+		// 	fmt.Println("-----------")
+
+		// 	// os.Exit(1)
+
+		// }
 	}
 
 	return directories
