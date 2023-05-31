@@ -47,11 +47,6 @@ func main() {
 			segmentsAreTheSame := aAndBOverlap(thisLineSegment, previousSegment)
 
 			if segmentsAreTheSame {
-				fmt.Println("thisLineSegment")
-				fmt.Println(thisLineSegment)
-				fmt.Println("previousSegment")
-				fmt.Println(previousSegment)
-				fmt.Println("-----")
 
 				totalMatches++
 			}
@@ -61,7 +56,6 @@ func main() {
 
 	}
 
-	fmt.Println("totalMatches")
 	fmt.Println(totalMatches)
 }
 
@@ -83,7 +77,6 @@ func getSections(rangeString string) []int {
 	if err != nil {
 		log.Fatal(err)
 	}
-	// splitRange := []int{strings.Split(rangeString, "-")[0], strings.Split(rangeString, "-")[0]}
 
 	for i := rangeMin; i <= rangeMax; i++ {
 		sections = append(sections, i)
