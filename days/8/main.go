@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"fmt"
 	"os"
 	"strconv"
 	"strings"
@@ -13,12 +14,6 @@ func check(e error) {
 	}
 }
 
-// go from left to right, then right to left
-
-// each pass, keep track of the current highest. At each tree, if the current tree is higher than the current highest, update an array with its index.
-
-// do this for each row
-
 func main() {
 
 	file, err := os.Open("./input.txt")
@@ -29,23 +24,6 @@ func main() {
 
 	scanner := bufio.NewScanner(file)
 
-	// currentHighest := 0
-
-	// var seenFromLeft []int[]int
-	// seenFromLeft := make(map[int]map[int]int)
-
-	// fileStats, err := file.Stat()
-
-	// check(err)
-
-	// for i := int64(0); i < int64(fileStats.Size()); i++ {
-
-	// }
-
-	// treeArrays := make([][]int, 4)
-
-	// tree arrays should have 4 arrays, each containing arrats of ints. The 4 arrays are the 4 directions and have the keys left, right, top, bottom
-
 	treeArrays := make(map[string]map[int]map[int]int, 0)
 
 	treeArrays["left"] = make(map[int]map[int]int, 0)
@@ -55,33 +33,35 @@ func main() {
 
 	rowIndex := 0
 
+	var arraysLength int
+
 	for scanner.Scan() {
 
 		thisLine := scanner.Text()
 
 		check(scanner.Err())
 
-		// fmt.Println(seenFromLeft)
+		arraysLength = len(thisLine)
 
-		// thisLineLeft := make(map[int]int, 0)
-
-		// left
-
-		// right
-
-		treeArrays["left"][rowIndex] = make(map[int]int, len(thisLine))
-		treeArrays["right"][rowIndex] = make(map[int]int, len(thisLine))
+		treeArrays["left"][rowIndex] = make(map[int]int, arraysLength)
+		treeArrays["right"][rowIndex] = make(map[int]int, arraysLength)
 
 		for i, char := range strings.Split(thisLine, "") {
+
+			if rowIndex == 0 {
+				treeArrays["top"][i] = make(map[int]int, arraysLength)
+				treeArrays["bottom"][i] = make(map[int]int, arraysLength)
+			}
 
 			charAsInt, err := strconv.Atoi(char)
 
 			check(err)
 
-			// thisLineLeft[i] = charAsInt
-
 			treeArrays["left"][rowIndex][i] = charAsInt
-			treeArrays["right"][rowIndex][len(thisLine)-i-1] = charAsInt
+			treeArrays["right"][rowIndex][arraysLength-i-1] = charAsInt
+
+			treeArrays["top"][i][rowIndex] = charAsInt
+			treeArrays["bottom"][i][arraysLength-rowIndex-1] = charAsInt
 
 		}
 
@@ -89,52 +69,74 @@ func main() {
 
 	}
 
-	// now get the top down and bottom up arrays
+	// we now have the left and right, top and bottom arrays for each row
+	// I then check each index against each of the other lists to see if it can be seen from any direction
 
-	for i := 0; i < len(treeArrays["left"]); i++ {
+	treesThatCanBeSeen := make(map[string]map[int]map[int]int, 0)
 
-		arrayLength := len(treeArrays["left"][i])
+	treesThatCanBeSeen["left"] = make(map[int]map[int]int, 0)
+	treesThatCanBeSeen["right"] = make(map[int]map[int]int, 0)
+	treesThatCanBeSeen["top"] = make(map[int]map[int]int, 0)
+	treesThatCanBeSeen["bottom"] = make(map[int]map[int]int, 0)
 
-		for j := 0; j < arrayLength; j++ {
+	for i := 0; i < arraysLength; i++ {
 
-			if i == 0 {
-				treeArrays["top"][j] = make(map[int]int, len(treeArrays["left"]))
-				treeArrays["bottom"][j] = make(map[int]int, len(treeArrays["left"]))
+		treesThatCanBeSeen["left"][i] = canBeSeen(treeArrays["left"][i])
+		treesThatCanBeSeen["right"][i] = canBeSeen(treeArrays["right"][i])
+		treesThatCanBeSeen["top"][i] = canBeSeen(treeArrays["top"][i])
+		treesThatCanBeSeen["bottom"][i] = canBeSeen(treeArrays["bottom"][i])
+
+	}
+
+	// then check the lists against each other
+	totalCanBeSeen := 0
+
+	for y := 0; y < arraysLength; y++ {
+
+		for x := 0; x < arraysLength; x++ {
+
+			reverseX := arraysLength - x - 1
+			reverseY := arraysLength - y - 1
+
+			if treesThatCanBeSeen["left"][y][x] == 1 ||
+				treesThatCanBeSeen["right"][y][reverseX] == 1 ||
+
+				treesThatCanBeSeen["top"][x][y] == 1 ||
+				treesThatCanBeSeen["bottom"][x][reverseY] == 1 {
+
+				totalCanBeSeen++
+
 			}
-
-			height := treeArrays["left"][i][j]
-
-			// fmt.Println(i, j, height)
-
-			treeArrays["top"][j][i] = height
-
-			treeArrays["bottom"][j][arrayLength-i-1] = height
 
 		}
 
 	}
 
-	// we now have the left and right arrays for each row
+	fmt.Println(totalCanBeSeen)
 
 }
 
-func canBeSeen(array []int) []int {
+func canBeSeen(array map[int]int) map[int]int {
 
-	currentHighest := 0
-	tallTrees := make([]int, 0)
+	// this cuts down any trees that can't be seen, marking them as 1
 
-	// for i := 0; i < len(thisLine); i++ {
-	for index, height := range array {
+	currentHighest := -1
+	canBeSeenList := make(map[int]int, len(array))
 
-		if height >= currentHighest {
+	for index := 0; index < len(array); index++ {
 
+		height := array[index]
+
+		if height > currentHighest {
 			currentHighest = height
 
-			tallTrees = append(tallTrees, index)
+			canBeSeenList[index] = 1
 
+		} else {
+			canBeSeenList[index] = 0
 		}
 
 	}
 
-	return tallTrees
+	return canBeSeenList
 }
