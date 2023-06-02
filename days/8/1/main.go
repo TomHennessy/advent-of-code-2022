@@ -6,6 +6,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func check(e error) {
@@ -15,8 +16,9 @@ func check(e error) {
 }
 
 func main() {
+	defer timer("main")()
 
-	file, err := os.Open("./input.txt")
+	file, err := os.Open("../input.txt")
 
 	check(err)
 
@@ -139,4 +141,11 @@ func canBeSeen(array map[int]int) map[int]int {
 	}
 
 	return canBeSeenList
+}
+
+func timer(name string) func() {
+	start := time.Now()
+	return func() {
+		fmt.Printf("%s took %v\n", name, time.Since(start))
+	}
 }
